@@ -1,0 +1,12 @@
+# artifacts/cache/data
+cache/
+out/
+.github/
+
+
+# misc
+.DS_Store
+.DS_Store?
+
+# env
+.env
