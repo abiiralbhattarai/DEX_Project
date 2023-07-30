@@ -14,9 +14,9 @@ library ZuniswapV2Library {
         address factoryAddress,
         address tokenA,
         address tokenB
-    ) public returns (uint256 reserveA, uint256 reserveB) {
+    ) public view returns (uint256 reserveA, uint256 reserveB) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
-        (uint256 reserve0, uint256 reserve1, ) = IZuniswapV2Pair(
+        (uint256 reserve0, uint256 reserve1, ) = IPanswapPair(
             pairFor(factoryAddress, token0, token1)
         ).getReserves();
         (reserveA, reserveB) = tokenA == token0
@@ -56,7 +56,7 @@ library ZuniswapV2Library {
                             hex"ff",
                             factoryAddress,
                             keccak256(abi.encodePacked(token0, token1)),
-                            keccak256(type(ZuniswapV2Pair).creationCode)
+                            keccak256(type(PanswapPair).creationCode)
                         )
                     )
                 )
@@ -83,7 +83,7 @@ library ZuniswapV2Library {
         address factory,
         uint256 amountIn,
         address[] memory path
-    ) public returns (uint256[] memory) {
+    ) public view returns (uint256[] memory) {
         if (path.length < 2) revert InvalidPath();
         uint256[] memory amounts = new uint256[](path.length);
         amounts[0] = amountIn;
@@ -118,7 +118,7 @@ library ZuniswapV2Library {
         address factory,
         uint256 amountOut,
         address[] memory path
-    ) public returns (uint256[] memory) {
+    ) public view returns (uint256[] memory) {
         if (path.length < 2) revert InvalidPath();
         uint256[] memory amounts = new uint256[](path.length);
         amounts[amounts.length - 1] = amountOut;

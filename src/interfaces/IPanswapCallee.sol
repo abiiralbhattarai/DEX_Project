@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.5.0;
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.10;
 
-interface IPancakeCallee {
-    function pancakeCall(
+interface IPanswapCallee {
+    function panswapCall(
         address sender,
-        uint256 amount0,
-        uint256 amount1,
+        uint256 amount0Out,
+        uint256 amount1Out,
         bytes calldata data
     ) external;
 }

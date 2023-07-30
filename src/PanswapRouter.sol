@@ -12,10 +12,10 @@ contract PanswapRouter {
     error InsufficientOutputAmount();
     error SafeTransferFailed();
 
-    IZuniswapV2Factory factory;
+    IPanswapFactory factory;
 
     constructor(address factoryAddress) {
-        factory = IZuniswapV2Factory(factoryAddress);
+        factory = IPanswapFactory(factoryAddress);
     }
 
     function addLiquidity(
@@ -46,7 +46,7 @@ contract PanswapRouter {
         );
         _safeTransferFrom(tokenA, msg.sender, pairAddress, amountA);
         _safeTransferFrom(tokenB, msg.sender, pairAddress, amountB);
-        liquidity = IZuniswapV2Pair(pairAddress).mint(to);
+        liquidity = IPanswapPair(pairAddress).mint(to);
     }
 
     function removeLiquidity(
@@ -62,8 +62,8 @@ contract PanswapRouter {
             tokenA,
             tokenB
         );
-        IZuniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity);
-        (amountA, amountB) = IZuniswapV2Pair(pair).burn(to);
+        IPanswapPair(pair).transferFrom(msg.sender, pair, liquidity);
+        (amountA, amountB) = IPanswapPair(pair).burn(to);
         if (amountA < amountAMin) revert InsufficientAAmount();
         if (amountA < amountBMin) revert InsufficientBAmount();
     }
@@ -138,7 +138,7 @@ contract PanswapRouter {
                     path[i + 2]
                 )
                 : to_;
-            IZuniswapV2Pair(
+            IPanswapPair(
                 ZuniswapV2Library.pairFor(address(factory), input, output)
             ).swap(amount0Out, amount1Out, to, "");
         }
@@ -151,7 +151,7 @@ contract PanswapRouter {
         uint256 amountBDesired,
         uint256 amountAMin,
         uint256 amountBMin
-    ) internal returns (uint256 amountA, uint256 amountB) {
+    ) internal view returns (uint256 amountA, uint256 amountB) {
         (uint256 reserveA, uint256 reserveB) = ZuniswapV2Library.getReserves(
             address(factory),
             tokenA,
