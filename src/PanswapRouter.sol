@@ -39,7 +39,7 @@ contract PanswapRouter {
             amountAMin,
             amountBMin
         );
-        address pairAddress = ZuniswapV2Library.pairFor(
+        address pairAddress = PanswapLibrary.pairFor(
             address(factory),
             tokenA,
             tokenB
@@ -57,11 +57,7 @@ contract PanswapRouter {
         uint256 amountBMin,
         address to
     ) public returns (uint256 amountA, uint256 amountB) {
-        address pair = ZuniswapV2Library.pairFor(
-            address(factory),
-            tokenA,
-            tokenB
-        );
+        address pair = PanswapLibrary.pairFor(address(factory), tokenA, tokenB);
         IPanswapPair(pair).transferFrom(msg.sender, pair, liquidity);
         (amountA, amountB) = IPanswapPair(pair).burn(to);
         if (amountA < amountAMin) revert InsufficientAAmount();
@@ -74,7 +70,7 @@ contract PanswapRouter {
         address[] calldata path,
         address to
     ) public returns (uint256[] memory amounts) {
-        amounts = ZuniswapV2Library.getAmountsOut(
+        amounts = PanswapLibrary.getAmountsOut(
             address(factory),
             amountIn,
             path
@@ -84,7 +80,7 @@ contract PanswapRouter {
         _safeTransferFrom(
             path[0],
             msg.sender,
-            ZuniswapV2Library.pairFor(address(factory), path[0], path[1]),
+            PanswapLibrary.pairFor(address(factory), path[0], path[1]),
             amounts[0]
         );
         _swap(amounts, path, to);
@@ -96,7 +92,7 @@ contract PanswapRouter {
         address[] calldata path,
         address to
     ) public returns (uint256[] memory amounts) {
-        amounts = ZuniswapV2Library.getAmountsIn(
+        amounts = PanswapLibrary.getAmountsIn(
             address(factory),
             amountOut,
             path
@@ -106,7 +102,7 @@ contract PanswapRouter {
         _safeTransferFrom(
             path[0],
             msg.sender,
-            ZuniswapV2Library.pairFor(address(factory), path[0], path[1]),
+            PanswapLibrary.pairFor(address(factory), path[0], path[1]),
             amounts[0]
         );
         _swap(amounts, path, to);
@@ -126,20 +122,16 @@ contract PanswapRouter {
     ) internal {
         for (uint256 i; i < path.length - 1; i++) {
             (address input, address output) = (path[i], path[i + 1]);
-            (address token0, ) = ZuniswapV2Library.sortTokens(input, output);
+            (address token0, ) = PanswapLibrary.sortTokens(input, output);
             uint256 amountOut = amounts[i + 1];
             (uint256 amount0Out, uint256 amount1Out) = input == token0
                 ? (uint256(0), amountOut)
                 : (amountOut, uint256(0));
             address to = i < path.length - 2
-                ? ZuniswapV2Library.pairFor(
-                    address(factory),
-                    output,
-                    path[i + 2]
-                )
+                ? PanswapLibrary.pairFor(address(factory), output, path[i + 2])
                 : to_;
             IPanswapPair(
-                ZuniswapV2Library.pairFor(address(factory), input, output)
+                PanswapLibrary.pairFor(address(factory), input, output)
             ).swap(amount0Out, amount1Out, to, "");
         }
     }
@@ -152,7 +144,7 @@ contract PanswapRouter {
         uint256 amountAMin,
         uint256 amountBMin
     ) internal view returns (uint256 amountA, uint256 amountB) {
-        (uint256 reserveA, uint256 reserveB) = ZuniswapV2Library.getReserves(
+        (uint256 reserveA, uint256 reserveB) = PanswapLibrary.getReserves(
             address(factory),
             tokenA,
             tokenB
@@ -161,7 +153,7 @@ contract PanswapRouter {
         if (reserveA == 0 && reserveB == 0) {
             (amountA, amountB) = (amountADesired, amountBDesired);
         } else {
-            uint256 amountBOptimal = ZuniswapV2Library.quote(
+            uint256 amountBOptimal = PanswapLibrary.quote(
                 amountADesired,
                 reserveA,
                 reserveB
@@ -170,7 +162,7 @@ contract PanswapRouter {
                 if (amountBOptimal <= amountBMin) revert InsufficientBAmount();
                 (amountA, amountB) = (amountADesired, amountBOptimal);
             } else {
-                uint256 amountAOptimal = ZuniswapV2Library.quote(
+                uint256 amountAOptimal = PanswapLibrary.quote(
                     amountBDesired,
                     reserveB,
                     reserveA
