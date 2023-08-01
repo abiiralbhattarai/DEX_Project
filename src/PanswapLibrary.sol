@@ -5,7 +5,7 @@ import "./interfaces/IPanswapFactory.sol";
 import "./interfaces/IPanswapPair.sol";
 import {PanswapPair} from "./PanswapPair.sol";
 
-library ZuniswapV2Library {
+library PanswapLibrary {
     error InsufficientAmount();
     error InsufficientLiquidity();
     error InvalidPath();
